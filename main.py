@@ -14,34 +14,24 @@ STATE = "r"
 
 def read_NFC():
     if ARDUINO:
-        # 1. Open the port with a timeout to prevent infinite hanging
         try:
             ser = serial.Serial('/dev/ttyUSB0', baudrate=9600, timeout=1)
-            
-            # 2. CRITICAL: Wait for Arduino to reboot after serial connection
+
             time.sleep(2) 
             
-            # 3. Clear the buffer of any "junk" data from bootup
             ser.reset_input_buffer()
 
             print("Place the miniature on the stand...")
 
             while True:
                 if ser.in_waiting > 0:
-                    # 4. Read an entire line until \n
                     line = ser.readline() 
-                    
-                    # Convert bytes to string and strip whitespace/newlines
                     uid = line.decode('utf-8').strip()
-                    
                     if uid:
                         if DEBUG:
                             print(f"UID read from arduino: {uid}")
                         return uid
-                
-                # Small sleep to prevent 100% CPU usage in the loop
                 time.sleep(0.1)
-
         except Exception as e:
             print(f"Serial Error: {e}")
             return None
